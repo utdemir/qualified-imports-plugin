@@ -1,0 +1,17 @@
+cabal-version:      3.0
+name:               example
+version:            0.1.0
+author:             Utku Demir
+maintainer:         me@utdemir.com
+
+executable example
+  main-is:          Main.hs
+  ghc-options:      -fplugin=QualifiedImportsPlugin
+  mixins:           base hiding (Prelude)
+                  , relude (Relude as Prelude)
+  build-depends:    base ^>=4.15.0.0
+                  , relude
+                  , text
+                  , containers
+                  , qualified-imports-plugin
+  default-language: Haskell2010

@@ -6,25 +6,47 @@ GHC 8.10 and GHC 9.
 # Example
 
 ```haskell
-module Test where
+module Main where
 
-f1 = Text.pack "test"
-f2 = HashMap.empty
+countChars :: Text -> [(Char, Int)]
+countChars txt =
+  txt
+    & Text.foldl
+        (\m chr -> Map.alter (Just . maybe 1 (+1)) chr m)
+        Map.empty
+    & Map.toList
+    & sortOn (Down . snd)
+
+main :: IO ()
+main =
+  countChars (Text.pack "a peck of pickled peppers")
+    & mapM_ print
 ```
 
-works, with a line on `cabal` file like:
+works, with a line on `cabal` stanza like:
 
 ```
-ghc-options:   -fplugin=QualifiedImportsPlugin
-build-depends: ...
-             , qualified-imports-plugin
+executable example
+  main-is:          Main.hs
+  ghc-options:      -fplugin=QualifiedImportsPlugin
+  mixins:           base hiding (Prelude)
+                  , relude (Relude as Prelude)
+  build-depends:    base ^>=4.15.0.0
+                  , relude
+                  , text
+                  , containers
+                  , qualified-imports-plugin
+  default-language: Haskell2010
 ```
+
+See the complete [example][].
 
 It comes with (hopefully) sane [defaults][], but these can be extended, eg:
 `-fplugin-opt=QualifiedImportsPlugin:Data.Graph:Graph`.  The defaults can
 also be ommitted via `-fplugin-opt=QualifiedImportsPlugin:no-defaults`.
 
 [defaults]: https://github.com/utdemir/qualified-imports-plugin/blob/main/src/QualifiedImportsPlugin.hs#L41-L60
+[example]: https://github.com/utdemir/qualified-imports-plugin/blob/main/example
 
 # Background
 
