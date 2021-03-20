@@ -20,7 +20,7 @@ build-depends: ...
              , qualified-imports-plugin
 ```
 
-It comes with (I think) sane defaults, but these can be extended, eg:
+It comes with (hopefully) sane defaults, but these can be extended, eg:
 `-fplugin-opt=QualifiedImportsPlugin:Data.Graph:Graph`.  The defaults can
 also be ommitted via `-fplugin-opt=QualifiedImportsPlugin:no-defaults`.
 
