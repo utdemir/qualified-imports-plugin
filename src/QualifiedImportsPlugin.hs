@@ -54,7 +54,9 @@ defaultImports =
     ("Data.HashMap.Lazy", "LHashMap"),
     ("Data.HashSet", "HashSet"),
     ("Data.Set", "Set"),
-    ("Data.Aeson", "Aeson")
+    ("Data.Aeson", "Aeson"),
+    ("Data.Vector", "Vector"),
+    ("Data.Vector.Mutable", "MVector")
   ]
 
 data Opts = Opts
