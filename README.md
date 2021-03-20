@@ -5,7 +5,7 @@ GHC 8.10 and GHC 9.
 
 # Example
 
-```
+```haskell
 module Test where
 
 f1 = Text.pack "test"
@@ -33,7 +33,7 @@ polymorphism), and make the code easier to follow through.
 However, this ends up introducing a bunch of import statements to most
 real-world modules, it is not uncommon to see sections like
 
-```
+```haskell
 import qualified Data.Map as Map
 import qualified Data.Text as Text
 import qualified Data.Aeson as Aeson
