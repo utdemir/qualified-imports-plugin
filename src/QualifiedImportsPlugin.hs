@@ -1,16 +1,16 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE CPP #-}
 
 module QualifiedImportsPlugin where
 
 import Data.Function ((&))
-import Data.Maybe (mapMaybe)
 import Data.Functor ((<&>))
 import Data.Generics
 import Data.Map (Map)
 import qualified Data.Map as Map
+import Data.Maybe (mapMaybe)
 
 #if __GLASGOW_HASKELL__ >= 900
 import GHC.Driver.Main (getHscEnv)
@@ -57,9 +57,8 @@ defaultImports =
     ("Data.Aeson", "Aeson")
   ]
 
-data Opts =
-  Opts {
-    optsNoDefaults :: Bool,
+data Opts = Opts
+  { optsNoDefaults :: Bool,
     optsCustomImports :: [(String, String)]
   }
 
@@ -71,13 +70,16 @@ instance Monoid Opts where
 
 parseOpts :: [CommandLineOption] -> Hsc Opts
 parseOpts [] = return mempty
-parseOpts (x:xs) = case parseOpt x of
+parseOpts (x : xs) = case parseOpt x of
   Nothing -> do
     () <- Hsc $ \env wm ->
       -- There must a better way than delving into Hsc manually, but I couldn't find the function
       -- 'WarnMsg -> Hsc ()'.
-      let msg = mkPlainWarnMsg (hsc_dflags env) (UnhelpfulSpan $ unhelpfulOther "QualifiedImportsPlugin")
-            ("Unknown argument:" <+> text x)
+      let msg =
+            mkPlainWarnMsg
+              (hsc_dflags env)
+              (UnhelpfulSpan $ unhelpfulOther "QualifiedImportsPlugin")
+              ("Unknown argument:" <+> text x)
        in return ((), consBag msg wm)
     parseOpts xs
   Just opts -> (opts <>) <$> parseOpts xs
@@ -88,20 +90,21 @@ Valid options:
 - <actual_module_name>:<qualified_name>
 -}
 parseOpt :: CommandLineOption -> Maybe Opts
-parseOpt "no-defaults" = Just $ mempty { optsNoDefaults = True }
+parseOpt "no-defaults" = Just $ mempty {optsNoDefaults = True}
 parseOpt xs =
   -- Check if something looks like two module names separated by a colon. This still allows some
   -- invalid module names, but I think it is good enough.
   case span (/= ':') xs of
-    (from, ':':to)
-      | all allowed from && all allowed to -> Just $ mempty { optsCustomImports = [(from, to)] }
-    _ ->  Nothing
- where
-  allowed c =
-    or [ 'a' <= c && c <= 'z'
-       , 'A' <= c && c <= 'Z'
-       , c == '.'
-       ]
+    (from, ':' : to)
+      | all allowed from && all allowed to -> Just $ mempty {optsCustomImports = [(from, to)]}
+    _ -> Nothing
+  where
+    allowed c =
+      or
+        [ 'a' <= c && c <= 'z',
+          'A' <= c && c <= 'Z',
+          c == '.'
+        ]
 
 plugin :: Plugin
 plugin =
@@ -146,13 +149,14 @@ modifyHsMod opts m = do
       newImports =
         imports
           & map (\(n, qn) -> (mkModuleName n, mkModuleName qn))
-          & mapMaybe (\(n, qn) ->
-              case Map.lookup qn refs of
-                Nothing
-                  | isModuleAvailable env n -> Just (Nothing, n, qn)
-                  | otherwise -> Nothing
-                Just loc ->
-                  Just (Just loc, n, qn)
+          & mapMaybe
+            ( \(n, qn) ->
+                case Map.lookup qn refs of
+                  Nothing
+                    | isModuleAvailable env n -> Just (Nothing, n, qn)
+                    | otherwise -> Nothing
+                  Just loc ->
+                    Just (Just loc, n, qn)
             )
           & map
             ( \(loc, n, qn) ->
