@@ -2,7 +2,7 @@ cabal-version:       3.0
 
 name:                qualified-imports-plugin
 synopsis:            Implicitly add some qualified imports
-version:             0.0.1.0
+version:             0.0.1
 homepage:            https://github.com/utdemir/qualified-imports-plugin
 license:             BSD-3-Clause
 author:              Utku Demir
