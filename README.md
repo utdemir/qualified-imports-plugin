@@ -5,6 +5,9 @@ GHC 8.10 and GHC 9.
 
 # Example
 
+This plugin, alongside with [relude][], allows below code to compile,
+without requiring explicit qualified imports.
+
 ```haskell
 module Main where
 
@@ -23,7 +26,7 @@ main =
     & mapM_ print
 ```
 
-works, with a line on `cabal` stanza like:
+With a `cabal` stanza like:
 
 ```
 executable example
@@ -78,7 +81,9 @@ has `import qualified Data.Text.Lazy as LText` as a default).
 
 # Details
 
-* It always adds the available imports, regardless if it is used or
+* One still needs to add required packages to the `.cabal` file.
+
+* The plugin imports the defined modules, regardless if they are used or
 not. This is to allow the suggestion in error messages to contain the
 available modules:
 
@@ -91,8 +96,11 @@ available modules:
     No module named ‘Teext’ is imported.
 ```
 
+  In the presence of orphan/overlapping instances this can break/change
+  the meaning of code.
+
 * It also adds the imports if an abbreviation used, but not possible
-to import. This again to get easier to understand errors:
+  to import. This again to get easier to understand errors:
 
 ```
     Could not load module ‘Data.Text’
