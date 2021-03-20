@@ -48,9 +48,9 @@ This plugin is a PoC to see what would it look like if we could omit
 some of those.
 
 My main use case in mind is using this alongside with the excellent
-[relude][]. Hence, the default names reflect the naming convention of
-`relude` (eg. `relude` has `LText` for `Data.Text.Lazy (Text)` hence
-this plugin has `import qualified Data.Text.Lazy as LText` as a default).
+[relude][]; so, the default names reflect the naming convention there
+(eg. `relude` has `LText` for `Data.Text.Lazy (Text)` hence this plugin
+has `import qualified Data.Text.Lazy as LText` as a default).
 
 [relude]: https://github.com/kowainik/relude
 
