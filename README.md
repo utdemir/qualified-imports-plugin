@@ -99,7 +99,7 @@ available modules:
   In the presence of orphan/overlapping instances this can break/change
   the meaning of code.
 
-* It also adds the imports if an abbreviation used, but not possible
+* It also adds the imports if an abbreviation is used, but not possible
   to import. This again to get easier to understand errors:
 
 ```
