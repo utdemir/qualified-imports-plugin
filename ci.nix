@@ -1,5 +1,5 @@
 let
-compilers = [ "ghc8104" "ghc901" ];
+compilers = [ "ghc8107Binary" "ghc902" "ghc924" ];
 withCompiler = c: (import ./default.nix {compiler=c;}).qualified-imports-plugin;
 in
 builtins.listToAttrs

@@ -1,5 +1,4 @@
 {-# LANGUAGE CPP #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 
@@ -79,7 +78,9 @@ parseOpts (x : xs) = case parseOpt x of
       -- 'WarnMsg -> Hsc ()'.
       let msg =
             mkPlainWarnMsg
+#if __GLASGOW_HASKELL__ < 902
               (hsc_dflags env)
+#endif
               (UnhelpfulSpan $ unhelpfulOther "QualifiedImportsPlugin")
               ("Unknown argument:" <+> text x)
        in return ((), consBag msg wm)
@@ -162,10 +163,10 @@ modifyHsMod opts m = do
             )
           & map
             ( \(loc, n, qn) ->
-                (maybe noLoc L loc)
+                (maybe noLocA noAnnLoc loc)
                   (simpleImportDecl n)
                     { ideclQualified = QualifiedPre,
-                      ideclAs = Just (noLoc qn),
+                      ideclAs = Just (noLocA qn),
                       -- This makes GHC not complain about unused imports.
                       ideclImplicit = True
                     }
@@ -175,7 +176,7 @@ modifyHsMod opts m = do
 -- Figure out if the module is available to import.
 isModuleAvailable :: HscEnv -> ModuleName -> Bool
 isModuleAvailable env n =
-  let us = unitState $ hsc_dflags env
+  let us = hsc_units env
    in case lookupModuleWithSuggestions us n Nothing of
         LookupFound _ _ -> True -- "found"
         LookupMultiple _ -> False -- "multiple"
@@ -203,3 +204,24 @@ referencedModules m =
               Just (L loc (Qual m _)) -> Map.singleton m loc
               Just _ -> mempty
         )
+
+-- Compat stuff
+
+#if __GLASGOW_HASKELL__ < 902
+noLocA :: a -> Located a
+noLocA = noLoc
+
+noAnnLoc :: SrcSpan -> a -> Located a
+noAnnLoc = L
+#else
+noAnnLoc :: SrcSpan -> e -> GenLocated (SrcAnn ann) e
+noAnnLoc = L . noAnnSrcSpan
+#endif
+
+#if __GLASGOW_HASKELL__ < 900
+hsc_units :: HscEnv -> DynFlags
+hsc_units = hsc_dflags
+#elif __GLASGOW_HASKELL__ < 902
+hsc_units :: HscEnv -> UnitState
+hsc_units = unitState . hsc_dflags
+#endif
