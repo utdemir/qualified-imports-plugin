@@ -1,4 +1,4 @@
-{ compiler ? "ghc901" }:
+{ compiler ? "ghc92" }:
 
 let
   sources = import ./nix/sources.nix;
@@ -26,6 +26,7 @@ let
       pkgs.haskellPackages.cabal-install
       pkgs.haskellPackages.ghcid
       pkgs.haskellPackages.ormolu
+      pkgs.haskellPackages.haskell-language-server
       pkgs.niv
       pkgs.nixpkgs-fmt
     ];
